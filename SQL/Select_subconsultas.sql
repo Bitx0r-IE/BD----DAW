@@ -135,6 +135,20 @@ nº departamento  Empleados
 
 */
 
+/*v2*/
+
+SELECT dept_no "nº departamento", COUNT(*) "Empleados"
+FROM emple
+GROUP BY dept_no
+HAVING COUNT(*) >= ALL (SELECT COUNT(*)
+                        FROM emple
+                        GROUP BY dept_no);
+/*
+nº departamento  Empleados
+--------------- ----------
+             30          7
+*/
+
 /*Ejercicio_6:*/
 /*Buscar el oficio con el salario medio más bajo.*/
 
@@ -151,6 +165,20 @@ PROGRAMADOR             1235
 
 */
 
+/*v2*/
+
+SELECT oficio, AVG(salario)
+FROM emple
+GROUP BY oficio
+HAVING AVG(salario) <= ALL (SELECT AVG(salario)
+                            FROM emple
+                            GROUP BY oficio);
+/*
+FICIO          AVG(SALARIO)
+--------------- ------------
+PROGRAMADOR          1288,75
+*/
+
 /*Ejercicio_7*/
 /*¿Qué es incorrecto en esta sentencia?
 SELECT EMP_NO, APELLIDO
@@ -160,12 +188,30 @@ WHERE SALARIO = (SELECT MIN(SALARIO))
                  GROUP BY DEPT_NO);*/
 SELECT EMP_NO, APELLIDO
 FROM EMPLE
-WHERE SALARIO = (SELECT MIN(SALARIO)
-                 FROM EMPLE);
+WHERE SALARIO IN (SELECT MIN(SALARIO)
+                  FROM EMPLE
+                  GROUP BY DEPT_NO);
+/*
+   EMP_NO APELLIDO  
+---------- ----------
+      7900 JIMENO    
+      7369 SANCHEZ   
+      7934 SANCHEZ    
+*/
+
+/*2º opción:*/
+
+SELECT EMP_NO, APELLIDO
+FROM EMPLE
+WHERE SALARIO = ANY (SELECT MIN(SALARIO)
+                     FROM EMPLE
+                     GROUP BY DEPT_NO);
 /*
     EMP_NO APELLIDO  
 ---------- ----------
+      7900 JIMENO    
       7369 SANCHEZ   
+      7934 SANCHEZ   
 */
 
 /*Ejercicio_8:*/
@@ -176,12 +222,60 @@ WHERE OFICIO = (SELECT OFICIO
                 FROM EMPLE
                 WHERE APELLIDO = 'PEREZ');*/
 
-SELECT APELLIDO, OFICIO
+--insertar empleado PEREZ:-- 
+
+INSERT INTO EMPLE (EMP_NO, APELLIDO, SALARIO, DEPT_NO)
+            VALUES (2222, 'PEREZ', 3000, 40);
+INSERT INTO EMPLE (EMP_NO, APELLIDO, SALARIO, DEPT_NO)
+            VALUES (3333, 'PEREZ2', 3000, 40);
+            
+SELECT * FROM EMPLE; 
+/*
+    EMP_NO APELLIDO   OFICIO             ID_JEFE FECHA_AL    SALARIO COMISION_PCT    DEPT_NO
+---------- ---------- --------------- ---------- -------- ---------- ------------ ----------
+      7839 REY        PRESIDENTE                 17/11/81       6500                      10
+      7566 JIMENEZ    GERENTE               7839 12/04/81       3867                      20
+      7698 NEGRO      GERENTE               7839 11/05/81       3705                      30
+      7782 CEREZO     GERENTE               7839 19/06/81       3185                      10
+      7788 GIL        ANALISTA              7566 19/11/81       3900                      20
+      7902 FERNANDEZ  ANALISTA              7566 13/12/81       3900                      20
+      7499 ARROYO     COMERCIAL             7698 20/02/80       2080           10         30
+      7521 SALA       COMERCIAL             7698 22/02/81       1625            5         30
+      7654 MARTIN     COMERCIAL             7698 29/09/81       1625            5         30
+      7844 TOVAR      COMERCIAL             7698 18/09/81       1950            8         30
+      7900 JIMENO     PROGRAMADOR           7566 13/12/81       1235                      30
+
+    EMP_NO APELLIDO   OFICIO             ID_JEFE FECHA_AL    SALARIO COMISION_PCT    DEPT_NO
+---------- ---------- --------------- ---------- -------- ---------- ------------ ----------
+      7369 SANCHEZ    PROGRAMADOR           7566 17/12/80       1040                      20
+      7876 ALONSO     PROGRAMADOR           7788 23/09/81       1430                      20
+      7934 SANCHEZ    AUXILIAR              7782 23/01/82       1690                      10
+      7984 GUTIERREZ  PROGRAMADOR           7839 21/02/81       1450                      30
+      2222 PEREZ                                                3000                      40
+      3333 PEREZ2                                               3000                      40
+*/
+
+/*Comprobación enunciado ejercicio:*/
+
+SELECT APELLIDO, NVL(OFICIO, 'SIN OFICIO') "OFICIO"
 FROM EMPLE
-WHERE OFICIO = (SELECT OFICIO
-                FROM EMPLE
-                WHERE UPPER(APELLIDO) = 'PEREZ');
-/*No hay nadie con el apellido Perez*/
+WHERE NVL(OFICIO, 'SIN') = (SELECT NVL(OFICIO, 'SIN')
+                            FROM EMPLE
+                            WHERE UPPER(APELLIDO) = 'PEREZ')
+AND UPPER(APELLIDO) <> 'PEREZ'; -- != Sirve
+/*
+APELLIDO   OFICIO         
+---------- ---------------
+PEREZ2     SIN OFICIO 
+*/
+--sin eliminar de la selección a PEREZ:--
+/*
+APELLIDO   OFICIO         
+---------- ---------------
+PEREZ      SIN OFICIO     
+PEREZ2     SIN OFICIO    
+*/
+
 /*¿Qué ocurriría si existiera un oficio con valor nulo?*/
 
 /*Ejercicio_9:*/
@@ -301,6 +395,7 @@ GIL              3900         20
 FERNANDEZ        3900         20
 ARROYO           2080         30
 */
+
 /*Ejercicio_15:*/
 /*Modificar el ejercicio anterior para visualizar el apellido, el salario, el 
 código del departamento y el salario medio de los sueldos de ese departamento. 

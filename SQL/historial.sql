@@ -382,3 +382,11 @@ ejercicio 5*/
 tenga también almacenes. En nuestra base de datos ha aparecido una nueva tabla
 llamada almacenes que continene el código del almacén, numérico de 3, la 
 descripción alfanumerico de 10 y la localidad alfanumérico de 14.*/
+
+CREATE TABLE ALMACENES(
+    cod_almacen NUMBER(3),
+    descripcion VARCHAR2(10),
+    loc VARCHAR2(14),
+    CONSTRAINT cod_alm_pk PRIMARY KEY(cod_almacen),
+    CONSTRAINT loc_alm_fk FOREIGN KEY
+);

@@ -140,3 +140,87 @@ ARROYO     VENTAS
            PRODUCCION 
 */
 
+-------------------------------------------------------------------------------
+
+--Select_Varias_Tablas_2:--
+
+/*Ejercicio_1:*/
+/*Crear un listado único con todos los oficios que haya en el departamento 10. 
+Incluir la localidad del departamento en el resultado.*/
+
+SELECT  e.oficio, e.dept_no, d.loc
+FROM emple e, depart d
+WHERE e.dept_no = d.dept_no
+AND e.dept_no = 10;
+/*
+OFICIO             DEPT_NO LOC           
+--------------- ---------- --------------
+PRESIDENTE              10 SEVILLA       
+GERENTE                 10 SEVILLA       
+AUXILIAR                10 SEVILLA  
+*/
+
+/*Ejercicio_2:*/
+/*Obtener la siguiente salida:
+    DEPT_NO  DNOMBRE           Número de empleados
+    -------  ----------------- -------------------
+        10   CONTABILIDAD                       3
+        20   INVESTIGACIÓN                      5
+        30   VENTAS                             6
+        40   PRODUCCIÓN                         0
+*/
+    
+SELECT d.dept_no, d.dnombre, COUNT(e.emp_no) "Número de empleados"  
+FROM emple e, depart d
+WHERE e.dept_no(+) = d.dept_no
+GROUP BY d.dept_no, d.dnombre
+ORDER BY d.dept_no;
+/*
+   DEPT_NO DNOMBRE        Número de empleados
+---------- -------------- -------------------
+        10 CONTABILIDAD                     3
+        20 INVESTIGACION                    5
+        30 VENTAS                           7
+        40 PRODUCCION                       0
+*/
+
+/*Ejercicio_3:*/
+/*Visualizar el número de departamento, el nombre del departamento, y la cantidad 
+de empleados del departamento con más empleados.*/
+
+SELECT e.dept_no, d.dnombre, COUNT(e.emp_no) "Número de empleados"  
+FROM emple e, depart d
+GROUP BY d.dept_no, d.dnombre, e.dept_no 
+HAVING e.dept_no = d.dept_no
+AND COUNT(e.emp_no) = (SELECT MAX(COUNT(e.emp_no))
+                       FROM emple e
+                       GROUP BY e.dept_no)
+ORDER BY dept_no;
+/*
+  DEPT_NO DNOMBRE        Número de empleados
+---------- -------------- -------------------
+        30 VENTAS                           7
+*/
+
+/*Ejercicio_4:*/
+/*Mostrar el apellido, el nombre del departamento y el salario de cualquier 
+empleado cuyo salario y comisión coincidan con los de cualquier empleado que 
+trabaje en Barcelona, incluidos los que no tienen comisión.*/
+
+SELECT e.apellido, d.dnombre, e.salario
+FROM emple e, depart d
+WHERE e.dept_no = d.dept_no
+AND e.salario = ANY (SELECT e.salario
+                     FROM emple e, depart d
+                     WHERE UPPER(d.loc) = 'BARCELONA')
+AND e.comision_pct = ANY (SELECT e.comision_pct
+                          FROM emple e, depart d
+                          WHERE UPPER(d.loc) = 'BARCELONA');
+/*
+APELLIDO   DNOMBRE           SALARIO
+---------- -------------- ----------
+TOVAR      VENTAS               1950
+SALA       VENTAS               1625
+MARTIN     VENTAS               1625
+ARROYO     VENTAS               2080
+*/
