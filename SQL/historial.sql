@@ -387,6 +387,6 @@ CREATE TABLE ALMACENES(
     cod_almacen NUMBER(3),
     descripcion VARCHAR2(10),
     loc VARCHAR2(14),
-    CONSTRAINT cod_alm_pk PRIMARY KEY(cod_almacen),
-    CONSTRAINT loc_alm_fk FOREIGN KEY
+    CONSTRAINT cod_alm_pk PRIMARY KEY(cod_almacen) REFERENCES DEPARTS, 
+    CONSTRAINT loc_alm_fk FOREIGN KEY(loc) REFERENCES DEPARTS
 );
