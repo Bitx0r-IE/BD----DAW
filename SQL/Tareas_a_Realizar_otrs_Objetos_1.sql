@@ -106,13 +106,31 @@ FOR scott.salgrade;
 1. Mira el nombre de los sinónimos que tienes asociados a tu esquema, así como 
 el nombre de la tabla y tabla propietaria.*/
 
+DESC USER_SYNONYMS;
+
 SELECT SYNONYM_NAME, TABLE_NAME, TABLE_OWNER
-FROM USER_SYNONYMS
+FROM USER_SYNONYMS;
 
 /*2. Comprueba que existe el sinónimo público que acaba de crear SCOTT.
 NOTA: Recuerda que debes usar la vista del diccionario ALL_VIEWS*/
+
+DESC ALL_SYNONYMS;
+
+SELECT * 
+FROM ALL_SYNONYMS
+WHERE upper(synonym_name) = GRADOSAL25;
+
 /*3. Usando el sinónimo CSALxx accede al contenido de la tabla SALGRADE de SCOTT.*/
+
+SELECT * FROM CSAL25;
+
 /*4. Nos acaban de decir que SCOTT ha creado un sinónimo público denominado GRADOSALxx
 para la tabla de SCOTT denominada SALGRADE. Probamos si podemos usarlo para ver 
 todo el contenido de la tabla.*/
+
+
+
+
 /*5. Borra el sinónimo DEP.*/
+
+DROP SYNONYM DEP;
