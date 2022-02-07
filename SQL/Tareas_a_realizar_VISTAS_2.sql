@@ -8,7 +8,16 @@ AS
 SELECT dept_no, MIN(salario), AVG(salario)
 FROM emple
 GROUP BY dept_no;
+/*View DEPT_SUM creado.*/
 
+SELECT * FROM DEPT_SUM;
+/*
+DEPT_NOMBRE    SAL_MIN    SAL_MED
+----------- ---------- ----------
+         30       1235 1952,85714
+         20       1040     2827,4
+         10       1690 3791,66667
+*/
 
 ----------------------------------------------------------------------------------------------------------------------------
 
@@ -18,7 +27,21 @@ las que intervienen el sueldo máximo de cada departamento, así que deciden crear
 una vista denominada DEPT_SALMAX. Realiza una vista que muestre el código del 
 departamento y el salario máximo del departamento.*/
 
+CREATE OR REPLACE VIEW DEPT_SALMAX (Nº_DEPT, SAL_MAX)
+AS
+SELECT dept_no, MAX(salario)
+FROM emple
+GROUP BY dept_no;
+/*View DEPT_SALMAX creado*/
 
+SELECT * FROM DEPT_SALMAX;
+/*
+  Nº_DEPT    SAL_MAX
+---------- ----------
+        30       3705
+        20       3900
+        10       6500
+*/
 
 ----------------------------------------------------------------------------------------------------------------------------
 
@@ -29,7 +52,9 @@ empleados cuyo salario sea el máximo de su departamento.
 PISTA: Piensa que una vista es una tabla lógica. Usa alguna de las vistas creada 
 en el apartado anterior.*/
 
-
+SELECT e.apellido, e.salario, v.*
+FROM emple e, DEPT_SALMAX v
+WHERE e.dept_no = v.dept_no;
 
 ----------------------------------------------------------------------------------------------------------------------------
 
