@@ -148,7 +148,7 @@ ARROYO     VENTAS
 /*Crear un listado único con todos los oficios que haya en el departamento 10. 
 Incluir la localidad del departamento en el resultado.*/
 
-SELECT  e.oficio, e.dept_no, d.loc
+SELECT DISTINCT e.oficio, e.dept_no, d.loc
 FROM emple e, depart d
 WHERE e.dept_no = d.dept_no
 AND e.dept_no = 10;
@@ -195,6 +195,22 @@ HAVING e.dept_no = d.dept_no
 AND COUNT(e.emp_no) = (SELECT MAX(COUNT(e.emp_no))
                        FROM emple e
                        GROUP BY e.dept_no)
+ORDER BY dept_no;
+/*
+  DEPT_NO DNOMBRE        Número de empleados
+---------- -------------- -------------------
+        30 VENTAS                           7
+*/
+
+/*v2*/
+
+SELECT e.dept_no, d.dnombre, COUNT(e.emp_no) "Número de empleados"  
+FROM emple e, depart d
+GROUP BY d.dept_no, d.dnombre, e.dept_no 
+HAVING e.dept_no = d.dept_no
+AND COUNT(e.emp_no) >= ALL (SELECT COUNT(e.emp_no)
+                            FROM emple e
+                            GROUP BY e.dept_no)
 ORDER BY dept_no;
 /*
   DEPT_NO DNOMBRE        Número de empleados

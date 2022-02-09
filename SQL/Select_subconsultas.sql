@@ -281,40 +281,59 @@ PEREZ2     SIN OFICIO
 /*Ejercicio_9:*/
 /*Mostrar los apellidos de los empleados que no tienen subordinados.*/
 
-SELECT apellido, oficio
+SELECT apellido
 FROM emple
-WHERE id_jefe IS NOT NULL;
+WHERE emp_no NOT IN (SELECT DISTINCT id_jefe
+                     FROM emple
+                     WHERE id_jefe IS NOT NULL);
 /*
-APELLIDO   OFICIO         
----------- ---------------
-JIMENEZ    GERENTE        
-NEGRO      GERENTE        
-CEREZO     GERENTE        
-GIL        ANALISTA       
-FERNANDEZ  ANALISTA       
-ARROYO     COMERCIAL      
-SALA       COMERCIAL      
-MARTIN     COMERCIAL      
-TOVAR      COMERCIAL      
-JIMENO     PROGRAMADOR    
-SANCHEZ    PROGRAMADOR    
-
-APELLIDO   OFICIO         
----------- ---------------
-ALONSO     PROGRAMADOR    
-SANCHEZ    AUXILIAR      
+APELLIDO  
+----------
+SANCHEZ
+ARROYO
+SALA
+MARTIN
+TOVAR
+ALONSO
+JIMENO
+FERNANDEZ
+SANCHEZ
+GUTIERREZ   
 */
 
 /*Ejercicio_10:*/
 /*Mostrar los apellidos de los empleados que tienen subordinados.*/
 
-SELECT apellido, oficio
+SELECT apellido
 FROM emple
-WHERE id_jefe IS NULL;
+WHERE emp_no = ANY (SELECT DISTINCT id_jefe
+                    FROM emple
+                    WHERE id_jefe IS NOT NULL);
 /*
-APELLIDO   OFICIO         
----------- ---------------
-REY        PRESIDENTE   
+ APELLIDO  
+----------
+JIMENEZ
+NEGRO
+CEREZO
+GIL
+REY
+*/
+
+/*v2*/
+
+SELECT apellido
+FROM emple
+WHERE emp_no IN (SELECT DISTINCT id_jefe
+                 FROM emple
+                 WHERE id_jefe IS NOT NULL);
+/*
+APELLIDO  
+----------
+JIMENEZ
+NEGRO
+CEREZO
+GIL
+REY
 */
 
 /*Ejercicio_11:*/
@@ -324,19 +343,19 @@ apellido contenga una 'U'.*/
 
 SELECT emp_no, apellido
 FROM emple
-WHERE dept_no = (SELECT dept_no
+WHERE dept_no IN (SELECT DISTINCT dept_no
                  FROM emple
                  WHERE UPPER(apellido) LIKE '%U%');
 /*
     EMP_NO APELLIDO  
 ---------- ----------
-      7698 NEGRO     
-      7499 ARROYO    
-      7521 SALA      
-      7654 MARTIN    
-      7844 TOVAR     
-      7900 JIMENO    
       7984 GUTIERREZ 
+      7900 JIMENO    
+      7844 TOVAR     
+      7654 MARTIN    
+      7521 SALA      
+      7499 ARROYO    
+      7698 NEGRO   
 */
 
 /*Ejercicio_12:*/
@@ -346,10 +365,16 @@ en un departamento con un empleado que tenga una 'U' en su apellido.*/
 
 SELECT emp_no, apellido
 FROM emple
-WHERE dept_no = (SELECT dept_no
+WHERE dept_no IN (SELECT DISTINCT dept_no
                  FROM emple
-                 WHERE UPPER(apellido) LIKE '%U%'
-                 AND salario > AVG(salario));
+                 WHERE UPPER(apellido) LIKE '%U%')
+AND salario > ALL (SELECT AVG(salario)
+                   FROM emple);
+/*
+    EMP_NO APELLIDO  
+---------- ----------
+      7698 NEGRO     
+*/
                  
 /*Ejercicio_13:*/
 /*Escribir una consulta para mostrar el apellido, número de departamento y el 
@@ -384,7 +409,7 @@ SELECT e.apellido, e.salario, e.dept_no
 FROM emple e
 WHERE salario > (SELECT AVG(emp.salario)
                  FROM emple emp
-                 WHERE emp.dept_no = e.dept_no);
+                 WHERE emp.dept_no = e.dept_no);--coordinación
 /*
 APELLIDO      SALARIO    DEPT_NO
 ---------- ---------- ----------
